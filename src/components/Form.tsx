@@ -1,9 +1,8 @@
 import { useFormik } from "formik";
+import Joi from "joi";
 
 interface IError {
-  firstName?: string;
-  lastName?: string;
-  city?: string;
+  [key: string]: string;
 }
 
 function Form() {
@@ -14,12 +13,31 @@ function Form() {
     validate: (values) => {
       const errors: IError = {};
 
-      if (values.firstName.length < 3) {
-        errors.firstName = "First name is too short";
+      //1. Simple rule validation example
+      // if (values.firstName.length < 3) {
+      //   errors.firstName = "First name is too short";
+      // }
+      // if (values.lastName.length < 3) {
+      //   errors.lastName = "Last name is too short";
+      // }
+
+      //2. JOI validation example
+      const schema = Joi.object().keys({
+        firstName: Joi.string().required().min(3),
+        lastName: Joi.string().required().min(3),
+      });
+
+      const { error } = schema.validate(values);
+
+      if (error) {
+        error.details.forEach((item) => {
+          if (item.context) {
+            const key = item.context + "";
+            errors[key] = item.message;
+          }
+        });
       }
-      if (values.lastName.length < 3) {
-        errors.lastName = "Last name is too short";
-      }
+
       return errors;
     },
 
