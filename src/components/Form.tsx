@@ -1,9 +1,27 @@
 import { useFormik } from "formik";
 
+interface IError {
+  firstName?: string;
+  lastName?: string;
+  city?: string;
+}
+
 function Form() {
   const formik = useFormik({
     //Default values of fields
-    initialValues: { firstName: "", lastName: "" },
+    initialValues: { firstName: "", lastName: "", city: "Tel-Aviv" },
+
+    validate: (values) => {
+      const errors: IError = {};
+
+      if (values.firstName.length < 3) {
+        errors.firstName = "First name is too short";
+      }
+      if (values.lastName.length < 3) {
+        errors.lastName = "Last name is too short";
+      }
+      return errors;
+    },
 
     onSubmit: (values) => {
       //do something on submit..
@@ -22,7 +40,11 @@ function Form() {
             id="firstName"
             value={formik.values.firstName}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           />
+          {formik.touched.firstName && formik.errors.firstName ? (
+            <div>{formik.errors.firstName}</div>
+          ) : null}
         </div>
         <div>
           <label>Last Name</label>
@@ -32,8 +54,25 @@ function Form() {
             id="lastName"
             value={formik.values.lastName}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           />
+          {formik.touched.lastName && formik.errors.lastName ? (
+            <div>{formik.errors.lastName}</div>
+          ) : null}
         </div>
+        <div>
+          <label>City</label>
+          <select
+            name="city"
+            id="city"
+            value={formik.values.city}
+            onChange={formik.handleChange}
+          >
+            <option value="Tel-Aviv">Tel Aviv</option>
+            <option value="Haifa">Haifa</option>
+          </select>
+        </div>
+
         <button type="submit">Submit</button>
       </form>
     </div>
